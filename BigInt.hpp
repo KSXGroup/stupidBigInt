@@ -18,6 +18,9 @@ class InvalidNumber{
     public:
         InvalidNumber(size_t LineNumber){std::cout << "\nInvalid Number For BigInt at:" << LineNumber << "\n";}
 };
+class DividedByZero{
+    DividedByZero(size_t LinenNumber){std::cout << "\nDivided By Zero at:" << LinenNumber << "\n";}
+};
 class BigString{
     public:
         friend BigString operator+(const BigString &a, const BigString &b);
@@ -511,6 +514,7 @@ BigInt operator*(const BigInt &a, const BigInt &b){
     return res;
 }
 BigInt operator/(const BigInt &a, const BigInt &b){
+    if(b.sz == 1 && b.data[0] == 0) throw DividedByZero(__LINE__);
     BigInt res;
     if(res.data){
         delete [] res.data;
