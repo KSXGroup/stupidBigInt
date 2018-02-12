@@ -19,7 +19,8 @@ class InvalidNumber{
         InvalidNumber(size_t LineNumber){std::cout << "\nInvalid Number For BigInt at:" << LineNumber << "\n";}
 };
 class DividedByZero{
-    DividedByZero(size_t LinenNumber){std::cout << "\nDivided By Zero at:" << LinenNumber << "\n";}
+    public:
+        DividedByZero(size_t LinenNumber){std::cout << "\nDivided By Zero at:" << LinenNumber << "\n";}
 };
 class BigString{
     public:
@@ -293,6 +294,7 @@ class BigInt{
             cap *= 2;
             int *tmp = new int[cap];
             for(size_t i = 0; i < cap / 2; ++i) tmp[i] = data[i];
+            for(size_t i = cap / 2; i < cap; ++i) tmp[i] = 0;
             delete [] data;
             data = tmp;
             tmp = nullptr;
@@ -395,6 +397,84 @@ class BigInt{
             data = a.data;
             a.data = nullptr;
             return *this;
+        }
+        BigInt& operator++(){
+            if(minus == 1){
+                if(sz == 1 && data[0] == 1){
+                    minus = 0;
+                    data[0] = 0;
+                    return *this;
+                }
+                else{
+                    data[0]--;
+                    for(size_t i = 0; i < sz - 1; ++i){
+                        if(data[i] < 0){
+                            data[i] += 10;
+                            data[i + 1]--;
+                        }
+                    }
+                    if(data[sz - 1] == 0) sz--;
+                    return *this;
+                }
+            }
+            else{
+                data[0]++;
+                for(size_t i = 0; i < sz; ++i){
+                    data[i + 1] += data[i] / 10;
+                    data[i] %= 10;
+                }
+                if(data[sz] > 0){
+                    sz++;
+                    if(sz == cap) doubleCapacity();
+                }
+                return *this;
+            }
+        }
+        BigInt operator++(int){
+            BigInt res(*this);
+            this->operator++();
+            return res;
+        }
+        BigInt& operator--(){
+            if(minus == 0){
+                if(sz == 1 && data[0] == 1){
+                    data[0]--;
+                    return *this;
+                }
+                data[0]--;
+                for(size_t i = 0; i < sz - 1; ++i){
+                    if(data[i] < 0){
+                        data[i] += 10;
+                        data[i + 1]--;
+                    }
+                }
+                if(data[sz - 1] == 0) sz--;
+                return *this;
+            }
+            else{
+                if(sz == 1 && data[0] == 0){
+                    minus = 1;
+                    data[0] = 1;
+                    return *this;
+                }
+                else{
+                    data[0]++;
+                    for(size_t i = 0; i < sz; ++i){
+                        data[i + 1] += data[i] / 10;
+                        data[i] %= 10;
+                    }
+                    if(data[sz] > 0){
+                        sz++;
+                        if(sz == cap) doubleCapacity();
+                    }
+                return *this;
+                }
+            }
+        }
+        BigInt operator--(int){
+            BigInt res(*this);
+            this -> operator--();
+            return res;
         }
     public:
         inline bool ifMinus() const{ return minus;}
