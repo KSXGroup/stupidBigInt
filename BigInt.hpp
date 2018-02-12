@@ -1,3 +1,5 @@
+#ifndef __BIGINT_HPP__
+#define __BIGINT_HPP__
 #include <iostream>
 #include <cstring>
 const size_t INITIAL_CAPACITY = 15;
@@ -785,6 +787,7 @@ std::ostream& operator<<(std::ostream &out, const BigInt &a){
 }
 
 
+#endif
 
 
 
