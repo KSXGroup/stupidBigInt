@@ -8,7 +8,6 @@ BigInt pow(BigInt base, BigInt exponent){
         if(exponent % 2 == 1) res = res * base;
         base = base * base;
         exponent = exponent / 2;
-        std::cout << exponent << std::endl;
     }
     return res;
 }
