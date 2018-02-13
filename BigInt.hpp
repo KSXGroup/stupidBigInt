@@ -322,6 +322,7 @@ class BigInt{
             for(size_t i = 0; i < cap; ++i) data[i] = 0;
         }
         BigInt(const long long &a) : BigInt(){
+            if(a == 0) return;
             sz = 0;
             long long b = a;
             if(b < 0){
@@ -334,7 +335,7 @@ class BigInt{
                 b /= 10;
             }
         }
-        BigInt(const char* s){
+        explicit BigInt(const char* s){
             bool zeroflag = 0;
             if(*s == '-'){
                 minus = 1;
@@ -579,6 +580,7 @@ BigInt operator*(const BigInt &a, const BigInt &b){
     res.sz = a.sz + b.sz;
     res.cap = a.cap + b.cap;
     res.data = new int[res.cap];
+    if(res.cap == res.sz) res.doubleCapacity();
     for(size_t i = 0; i < res.cap; ++i) res.data[i] = 0;
     for(size_t i = 0; i < b.sz; ++i){
         for(size_t j = 0; j < a.sz; ++j ){
@@ -598,6 +600,7 @@ BigInt operator*(const BigInt &a, const BigInt &b){
 BigInt operator/(const BigInt &a, const BigInt &b){
     if(b.sz == 1 && b.data[0] == 0) throw DividedByZero(__LINE__);
     BigInt res;
+    int lo = 0, hi = 10, mid = 0;
     if(res.data){
         delete [] res.data;
         res.data = nullptr;
@@ -620,26 +623,20 @@ BigInt operator/(const BigInt &a, const BigInt &b){
         res.cap = res.sz * 2;
         res.data = new int[res.cap];
         for(size_t i = 0; i < res.cap; ++i) res.data[i] = 0;
-        res.data[a.sz - b.sz] = 0;
         for(size_t i = res.sz - 1; i >= 0; --i){
             if(i >= res.sz) break;
-            res.data[i] = 1;
-            cmp = BigInt::absCompare(a, res * b);
-            if(cmp == 1){
-                int lastCmp = 1, currentCmp = -1;
-                for(int j = 2; j <= 9; ++j){
-                    res.data[i] = j;
-                    currentCmp = BigInt::absCompare(a, res * b);
-                    if(currentCmp == 2) return res;
-                    else if(currentCmp == 0 && lastCmp == 1){
-                        res.data[i]--;
-                        lastCmp = currentCmp;
-                        break;
-                    }
-                }
+            while(hi - lo > 1){
+                mid = (lo + hi) / 2;
+                res.data[i] = mid;
+                cmp = BigInt::absCompare(a, b * res);
+                if(cmp == 1) lo = mid;
+                else if(cmp == 0) hi = mid;
+                else return res;
             }
-            else if(cmp == 2) return res;
-            else --res.sz;
+            //std::cout << i <<" : "<< hi << " : " << lo << "\n";
+            if(hi <= 1 && i == res.sz - 1) res.sz--;
+            else res.data[i] = lo;
+            hi = 10; lo = 0;
         }
         return res;
     }
