@@ -293,6 +293,7 @@ class BigInt{
         size_t sz = 0;
         size_t cap = 0;
         void doubleCapacity(){
+            std::cerr << *this << "\n";
             cap *= 2;
             int *tmp = new int[cap];
             for(size_t i = 0; i < cap / 2; ++i) tmp[i] = data[i];
@@ -483,6 +484,7 @@ class BigInt{
         inline bool ifMinus() const{ return minus;}
         inline size_t size() const{return sz;}
         inline size_t length() const{return sz;}
+        inline size_t capacity() const{return cap;}
     public:
         BigInt operator-() const{
             BigInt tmp(*this);
@@ -578,9 +580,12 @@ BigInt operator*(const BigInt &a, const BigInt &b){
     if(res.data) delete [] res.data;
     res.minus = a.minus == b.minus ? 0 : 1;
     res.sz = a.sz + b.sz;
-    res.cap = a.cap + b.cap;
+    res.cap = res.sz * 2;
     res.data = new int[res.cap];
-    if(res.cap == res.sz) res.doubleCapacity();
+    if(res.cap == res.sz){
+        res.doubleCapacity();
+        //std::cerr << "doubled\n";
+    }
     for(size_t i = 0; i < res.cap; ++i) res.data[i] = 0;
     for(size_t i = 0; i < b.sz; ++i){
         for(size_t j = 0; j < a.sz; ++j ){
@@ -665,7 +670,8 @@ bool operator>(const BigInt &a, const BigInt &b){
                 else return 0;
             }
             else{
-                for(size_t i = 0; i < a.sz; ++i){
+                for(size_t i = a.sz - 1; i >= 0 ;--i){
+                    if(i >= a.sz) break;
                     if(a.data[i] > b.data[i]) return 1;
                     else if(a.data[i] < b.data[i]) return 0;
                 }
@@ -678,7 +684,8 @@ bool operator>(const BigInt &a, const BigInt &b){
                 else return 1;
             }
             else{
-                for(size_t i = 0; i < a.sz; ++i){
+                for(size_t i = a.sz - 1; i >= 0; --i){
+                    if(i >= a.sz) break;
                     if(a.data[i] > b.data[i]) return 0;
                     else if(a.data[i] < b.data[i]) return 1;
                 }
@@ -699,7 +706,8 @@ bool operator>=(const BigInt &a, const BigInt &b){
                 else return 0;
             }
             else{
-                for(size_t i = 0; i < a.sz; ++i){
+                for(size_t i = a.sz - 1; i >= 0; --i){
+                    if(i >= a.sz) break;
                     if(a.data[i] > b.data[i]) return 1;
                     else if(a.data[i] < b.data[i]) return 0;
                 }
@@ -712,7 +720,8 @@ bool operator>=(const BigInt &a, const BigInt &b){
                 else return 1;
             }
             else{
-                for(size_t i = 0; i < a.sz; ++i){
+                for(size_t i = a.sz - 1; i >= 0; --i){
+                    if(i >= a.sz) break;
                     if(a.data[i] > b.data[i]) return 0;
                     else if(a.data[i] < b.data[i]) return 1;
                 }
